@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RickAndMortyVisualizador", "RickAndMortyVisualizador.csproj", "{2069534D-23FA-4A75-9CAE-579110EF232A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2069534D-23FA-4A75-9CAE-579110EF232A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2069534D-23FA-4A75-9CAE-579110EF232A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2069534D-23FA-4A75-9CAE-579110EF232A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2069534D-23FA-4A75-9CAE-579110EF232A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB749445-F6B8-4385-A8FA-FF05C3C2DA60}
+	EndGlobalSection
+EndGlobal

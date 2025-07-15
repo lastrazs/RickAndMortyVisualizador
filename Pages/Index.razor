@@ -1,0 +1,122 @@
+﻿@page "/"
+@using RickAndMortyVisualizador.Models
+@using RickAndMortyVisualizador.Services
+@inject CharacterService CharacterService
+@inject LocalStorageService LocalStorageService
+
+
+<h1>Rick and Morty</h1>
+
+<h4>Filtros</h4>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" @bind="searchTerm" class="form-control" placeholder="Buscar por nombre" />
+    </div>
+
+    <div class="col-md-3">
+        <select @bind="selectedStatus" class="form-select">
+            <option value="">Todos los estados</option>
+            <option value="Alive">Vivo</option>
+            <option value="Dead">Muerto</option>
+            <option value="unknown">Desconocido</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <input type="text" @bind="selectedSpecies" class="form-control" placeholder="Buscar por especie" />
+    </div>
+
+    <div class="col-md-3">
+        <select @bind="scoreFilter" class="form-select">
+            <option value="none">Orden normal</option>
+            <option value="likes">Más Likes</option>
+            <option value="dislikes">Más Dislikes</option>
+        </select>
+    </div>
+</div>
+
+
+@if (characters == null)
+{
+    <p>Cargando personajes...</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var character in FilteredCharacters)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow">
+                    <img src="@character.Image" class="card-img-top" alt="@character.Name" />
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@character.Name</h5>
+                        <p class="card-text">@character.Species | @character.Status</p>
+                        <button class="btn btn-success btn-sm me-2" @onclick="@(() => Like(character))">👍 Like</button>
+                        <button class="btn btn-danger btn-sm" @onclick="@(() => Dislike(character))">👎 Dislike</button>
+                        <p class="mt-2">Puntaje: @character.Score</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+
+    private string searchTerm = "";
+    private string selectedStatus = "";
+    private string selectedSpecies = "";
+    private string scoreFilter = "none";
+
+
+    private List<Character>? characters;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        characters = await CharacterService.GetCharactersAsync();
+
+        var storedScores = await LocalStorageService.GetItemAsync<Dictionary<int, int>>("characterScores") ?? new();
+
+        foreach (var character in characters)
+        {
+            if (storedScores.TryGetValue(character.Id, out var score))
+            {
+                character.Score = score;
+            }
+        }
+    }
+
+
+    private IEnumerable<Character> FilteredCharacters =>
+    characters!
+        .Where(c =>
+            (string.IsNullOrWhiteSpace(searchTerm) || c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(selectedStatus) || c.Status.Equals(selectedStatus, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(selectedSpecies) || c.Species.Contains(selectedSpecies, StringComparison.OrdinalIgnoreCase)))
+        .OrderByDescending(c => scoreFilter switch
+        {
+            "likes" => c.Score,
+            "dislikes" => -c.Score,
+            _ => 0
+        });
+
+    private async Task Like(Character character)
+    {
+        character.Score++;
+        await SaveScoresAsync();
+    }
+
+    private async Task Dislike(Character character)
+    {
+        character.Score--;
+        await SaveScoresAsync();
+    }
+
+    private async Task SaveScoresAsync()
+    {
+        var scores = characters.ToDictionary(c => c.Id, c => c.Score);
+        await LocalStorageService.SetItemAsync("characterScores", scores);
+    }
+}
